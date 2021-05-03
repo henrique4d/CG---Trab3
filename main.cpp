@@ -12,7 +12,24 @@
 #include <glm/ext/matrix_transform.hpp>  // glm::translate, glm::rotate, glm::scale
 #include <glm/ext/matrix_clip_space.hpp> // glm::perspective
 #include <glm/ext/scalar_constants.hpp>  // glm::pi
-int velA = 0;
+
+
+int height = 0;
+int vel = 0;
+int pov[2][3] = {{0,50,-75},{0,300,200}};
+int cur_pov = 1;
+
+int view[2][3] = {{0,100,-500},{0,100,0}};
+int cur_view = 1;
+
+int angle = 0;
+bool right = false; 
+bool left = false;
+
+int andar = 0;
+
+
+
 //vetores do aviao
 std::vector<glm::vec3> aviao_v;
 std::vector<glm::vec2> aviao_t;
@@ -67,6 +84,10 @@ std::vector<glm::vec3> m2_v;
 std::vector<glm::vec2> m2_t;
 std::vector<glm::vec3> m2_n;
 
+//parede
+std::vector<glm::vec3> p1_v;
+std::vector<glm::vec2> p1_t;
+std::vector<glm::vec3> p1_n;
 
 /*--------------------------------------------------------------------------------------------------*/
 
@@ -201,13 +222,19 @@ void desenhaOBJ(const std::vector<glm::vec3> &out_vertices, const std::vector<gl
 void drawAviao(){
     parser(aviao_v, aviao_t, aviao_n, "aviao2.obj");
 
-    glColor3f(0,1,0);
-    glPushMatrix();
-        glTranslated(0,0,-velA);
-        desenhaOBJ(aviao_v, aviao_t, aviao_n);
-    glPopMatrix();
+    glColor3f(0.5,0.5,0.5);
+        
+    desenhaOBJ(aviao_v, aviao_t, aviao_n);
 
     glutPostRedisplay();
+}
+
+void drawParede(){
+    parser(p1_v, p1_t, p1_n, "parede/grade.obj");
+
+    glColor3f(0.5,0.5,0.5);
+ 
+    desenhaOBJ(p1_v, p1_t, p1_n);
 }
 
 void drawGramSky(){
@@ -217,7 +244,7 @@ void drawGramSky(){
     desenhaOBJ(chao_v, chao_t, chao_n);
 
     glPushMatrix();
-        glColor3f(0,0,1);
+        glColor3f(0.12,0.699,0.756);
         glTranslated(1,2000,1);
         desenhaOBJ(chao_v, chao_t, chao_n);
     glPopMatrix();
@@ -228,7 +255,7 @@ void drawTree(){
     parser(a2_v, a2_t, a2_n, ("vegetacao/arvore2.obj"));
     parser(a3_v, a3_t, a3_n, ("vegetacao/arvore3.obj"));
 
-    glColor3f(1,1,1);
+    glColor3f(0.96,0.2,0.9);
     
     glPushMatrix();
         glTranslated(60,50,120);
@@ -241,7 +268,7 @@ void drawTree(){
     glPopMatrix();
 
     glPushMatrix();
-        glTranslated(20,240,0);
+        glTranslated(20,150,0);
         desenhaOBJ(a3_v, a3_t, a3_n);
     glPopMatrix();
 }
@@ -263,9 +290,27 @@ void drawCastle(){
     glPopMatrix();
 
     glPushMatrix();
-        glTranslated(3000,240,3000);
+        glTranslated(3000,150,3000);
         desenhaOBJ(a3_v, a3_t, a3_n);
         glTranslated(120,0,0);
+        desenhaOBJ(a3_v, a3_t, a3_n);
+    glPopMatrix();
+
+    glColor3f(0.43,0.1,0.75);
+    glPushMatrix();
+        glTranslated(-4000,460,-3000);
+        desenhaOBJ(c1_v, c1_t, c1_n);
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslated(-3000,0,-2000);
+        drawTree();
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslated(-3000,150,-3000);
+        desenhaOBJ(a3_v, a3_t, a3_n);
+        glTranslated(-120,0,0);
         desenhaOBJ(a3_v, a3_t, a3_n);
     glPopMatrix();
     //desenhaOBJ(c2_v, c2_t, c2_n);
@@ -276,10 +321,45 @@ void drawAnimals(){
     parser(animal2_v, animal2_t, animal2_n, ("animais/digimon.obj"));
     parser(animal3_v, animal3_t, animal3_n, ("animais/umbreon.obj"));
 
-    glColor3f(1,1,0);
-    desenhaOBJ(animal1_v, animal1_t, animal1_n);
-    desenhaOBJ(animal2_v, animal2_t, animal2_n);
-    desenhaOBJ(animal3_v, animal3_t, animal3_n);
+    for(int i = 0; i < 3; i ++){
+    glPushMatrix();
+        glTranslated(100 + i*1000,42,140 + i*500);
+        glColor3f(1,0.64,0);
+        desenhaOBJ(animal1_v, animal1_t, animal1_n);
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslated(100 + i*700,100,0 + i*2000);
+        glColor3f(1,0.79,0.64);
+        desenhaOBJ(animal2_v, animal2_t, animal2_n);
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslated(0 + i*500,16,0 + i*300);
+        glColor3f(0.67,0.84,0.9);
+        desenhaOBJ(animal3_v, animal3_t, animal3_n);
+    glPopMatrix();
+    }
+
+    for(int i = 1; i < 3; i ++){
+    glPushMatrix();
+        glTranslated(100 + i*-1000,42,140 + i*-500);
+        glColor3f(1,0.64,0);
+        desenhaOBJ(animal1_v, animal1_t, animal1_n);
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslated(100 + i*-700,100,0 + i*-2000);
+        glColor3f(1,0.79,0.64);
+        desenhaOBJ(animal2_v, animal2_t, animal2_n);
+    glPopMatrix();
+
+    glPushMatrix();
+        glTranslated(0 + i*-500,16,0 + i*-300);
+        glColor3f(0.67,0.84,0.9);
+        desenhaOBJ(animal3_v, animal3_t, animal3_n);
+    glPopMatrix();
+    }
 }
 
 void drawM(){
@@ -298,11 +378,93 @@ void drawM(){
     glPopMatrix();
 }
 
+void draw(void){
+    andar += vel;
+    glPushMatrix(); //movimenta o avião
+        glTranslated(500,-height,andar);
+        glRotated(angle,0,1,0);
+        drawGramSky();
+        drawCastle();
+        drawAnimals();
+        //drawParede();
+
+        drawM();
+
+        glBegin(GL_LINES);
+        glColor3f(1,0,0); //coloquei isso daq so pra ficar mais legal de ver o desenho, se fosse tudo da mesma cor ia ficar ruim de visualizar
+        glVertex3f(-500,0,0);
+        glVertex3f(500,0,0);
+        
+        glColor3f(0,0,1); //coloquei isso daq so pra ficar mais legal de ver o desenho, se fosse tudo da mesma cor ia ficar ruim de visualizar
+        glVertex3f(0,-500,0);
+        glVertex3f(0,500,0);
+
+        glColor3f(0,1,0); //coloquei isso daq so pra ficar mais legal de ver o desenho, se fosse tudo da mesma cor ia ficar ruim de visualizar
+        glVertex3f(0,0,-500);
+        glVertex3f(0,0,500);
+    glEnd();
+
+    glPopMatrix();
+
+    glutPostRedisplay();
+}
+
 void SpecialKeys(int key, int x, int y) {
-    if(key == GLUT_KEY_UP) {
-            velA ++;
-            std::cout << velA << "\n";
+    
+    if(key == GLUT_KEY_UP) {    //sobe
+            height += 15;
         }
+    if(key == GLUT_KEY_DOWN) {  //desce
+            height -= 15;
+        }
+    if(key == GLUT_KEY_RIGHT) {  //desce
+            if(right == true){
+                if(angle < 360) angle ++;
+                else angle = 0;
+            }
+            else{
+                right = true;
+                left = false;
+                //angle = 0;
+            }
+        }
+    if(key == GLUT_KEY_LEFT) {  //desce
+            if(left == true){
+                if(angle > 0) angle --;
+                else angle = 360;
+            }
+            else{
+                right = false;
+                left = true;
+                //angle = 0;
+            }
+        }
+}
+
+void HandleKeyboard(unsigned char key, int x, int y) {
+    switch (key){
+        case 'W':   //acelera pra frente
+        case 'w':
+            vel += 1;
+            break;
+        
+        case 'S':   //acelera para tras
+        case 's':
+            vel -= 1;
+            break;
+        
+        case 'F':   //pov fora
+        case 'f':
+            cur_pov = 1;
+            cur_view = 1;
+            break;
+
+        case 'I':   //pov inside
+        case 'i':
+            cur_pov = 0;
+            cur_view = 0;
+            break;
+    }
 }
 
 void init(void)
@@ -321,32 +483,16 @@ void display(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //limpa a janela
     glLoadIdentity();
-    gluLookAt(0, 300, 200 - velA,       // define posicao do observador (x -> esquerda roda, y -> cima embaixo, z ->tras frente)
-              0, 0, -velA, // ponto de interesse (foco)
+    gluLookAt(pov[cur_pov][0], pov[cur_pov][1], pov[cur_pov][2],       // define posicao do observador (x -> esquerda roda, y -> cima embaixo, z ->tras frente)
+              view[cur_view][0], view[cur_view][1], view[cur_view][2], // ponto de interesse (foco)
               0.0, 1.0, 0.0);    // vetor de "view up"
 
+    
+    draw();
 
-    drawGramSky();
+    
+
     drawAviao();
-
-    drawCastle();
-    drawM();
-    glColor3f(0,1,0);
-    glTranslated(-5600,0,-3300);
-
-    glBegin(GL_LINES);
-        glColor3f(1,0,0); //coloquei isso daq so pra ficar mais legal de ver o desenho, se fosse tudo da mesma cor ia ficar ruim de visualizar
-        glVertex3f(-500,0,0);
-        glVertex3f(500,0,0);
-        
-        glColor3f(0,0,1); //coloquei isso daq so pra ficar mais legal de ver o desenho, se fosse tudo da mesma cor ia ficar ruim de visualizar
-        glVertex3f(0,-500,0);
-        glVertex3f(0,500,0);
-
-        glColor3f(0,1,0); //coloquei isso daq so pra ficar mais legal de ver o desenho, se fosse tudo da mesma cor ia ficar ruim de visualizar
-        glVertex3f(0,0,-500);
-        glVertex3f(0,0,500);
-    glEnd();
     
     glFlush();
 }
@@ -362,7 +508,8 @@ int main(int argc, char **argv)
     glutCreateWindow("Visualizacao 3D - Exemplo 1"); //cria a janela
     init();
     glutDisplayFunc(display); //determina fun��o callback de desenho
-    
+    glutIdleFunc(draw);
+    glutKeyboardFunc(HandleKeyboard);
     glutSpecialFunc(SpecialKeys);
     glEnable(GL_DEPTH_TEST);  //habilita remo��o de superf�cies ocultas
     glEnable(GL_CULL_FACE);
