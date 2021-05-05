@@ -221,26 +221,33 @@ void menu() {
 
     //ajuda
     glColor3f(1,1,1);
-    texto("Help",50,250,0.4,0.4);
+    texto("Help",120,250,0.4,0.4);
 
-    texto("^",-130,130,0.4,0.4); texto(" - sobe",-110,145,0.2,0.2);
-    texto("v",-127,60,0.4,0.4); texto(" - desce",-110,75,0.2,0.2);
+    texto("^",-130,135,0.4,0.4); texto(" - sobe",-110,145,0.2,0.2);
+    texto("V",-128,45,0.4,0.4); texto(" - desce",-110,45,0.2,0.2);
     texto(">",140,135,0.4,0.4); texto(" - gira para direita",160,145,0.2,0.2);
-    texto("<",140,55,0.4,0.4); texto(" - gira para esquerda",160,75,0.2,0.2);
+    texto("<",140,45,0.4,0.4); texto(" - gira para esquerda",160,45,0.2,0.2);
 
-    texto("w",-130,-5,0.4,0.4); texto(" - acelera",-110,5,0.2,0.2);
-    texto("s",140,-5,0.4,0.4); texto(" - desacelera",160,5,0.2,0.2);
+    texto("W",-130,-35,0.4,0.4); texto(" - acelera",-110,-25,0.2,0.2);
+    texto("S",140,-35,0.4,0.4); texto(" - desacelera",160,-25,0.2,0.2);
 
-    texto("F",-130,-75,0.4,0.4); texto(" - POV: out",-110,-65,0.2,0.2);
-    texto("I",150,-75,0.4,0.4); texto(" - POV: inside",160,-65,0.2,0.2);
+    texto("F",-130,-115,0.4,0.4); texto(" - POV: out",-110,-105,0.2,0.2);
+    texto("I",150,-115,0.4,0.4); texto(" - POV: inside",160,-105,0.2,0.2);
 
-    texto("H",-40,-175,0.4,0.4); texto(" - volta para o menu",-20,-165,0.2,0.2); texto("e reseta o jogo",60,-195,0.2,0.2);
-
+    texto("H",20,-195,0.4,0.4); texto(" - volta para o menu",40,-185,0.2,0.2); texto("e reseta o jogo",115,-215,0.2,0.2);
+    texto("esc",20,-280,0.4,0.4);  texto(" - fecha o jogo",85,-275,0.2,0.2);
     //comandos
     glColor3f(1,1,1); 
     texto("Aperte1",-380,280,0.3,0.3);
     texto("Aperte2",-380,20,0.3,0.3);
     texto("Aperte3",-380,-240,0.3,0.3);
+
+    glBegin(GL_LINE_LOOP);
+        glVertex2f(-140,320);
+        glVertex2f(475,320);
+        glVertex2f(475,-340);
+        glVertex2f(-140,-340);
+    glEnd();
 
     //naves
     glColor3f(0,0,0); 
@@ -258,6 +265,7 @@ void menu() {
     texto("Dirigivel",-400,-320,0.4,0.4);
     glColor3f(0.5,0.5,0.5);
     quadrado(-400,-340,-220,-260);
+
 }
 
 void desenhaOBJ(const std::vector<vec3> &out_vertices, const std::vector<vec2> &out_texcoord, const std::vector<vec3> &out_normals){
@@ -488,8 +496,8 @@ void changeGame(){
     if(mode == 'm'){
         glClearColor(0.0, 0.0, 0.0, 0.0);
         
-        glLoadIdentity();
         glMatrixMode (GL_PROJECTION);
+        glLoadIdentity();
         gluOrtho2D(-500, 500, -500, 500);
         glShadeModel (GL_SMOOTH);
         glMatrixMode(GL_MODELVIEW);
@@ -543,6 +551,9 @@ void HandleKeyboard(unsigned char key, int x, int y) {
 
                 changeGame();
                 break;
+            case 27:
+                exit(0);
+                break;
         }
     }
 
@@ -568,6 +579,9 @@ void HandleKeyboard(unsigned char key, int x, int y) {
                 reset();
                 changeGame();
 
+                break;
+            case 27:
+                exit(0);
                 break;
         }
     }
