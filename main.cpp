@@ -90,6 +90,15 @@ std::vector<vec3> m2_v;
 std::vector<vec2> m2_t;
 std::vector<vec3> m2_n;
 
+//planets
+std::vector<vec3> p1_v;
+std::vector<vec2> p1_t;
+std::vector<vec3> p1_n;
+
+std::vector<vec3> p2_v;
+std::vector<vec2> p2_t;
+std::vector<vec3> p2_n;
+
 /*--------------------------------------------------------------------------------------------------*/
 
 void parser(std::vector<vec3> &out_vertices, std::vector<vec2> &out_texcoord, std::vector<vec3> &out_normals, std::string file_name){
@@ -262,7 +271,7 @@ void menu() {
     quadrado(-400,-80,-220,0);
 
     glColor3f(0,0,0); 
-    texto("Dirigivel",-400,-320,0.4,0.4);
+    texto("millenium",-365,-290,0.2,0.2); texto("falcon",-345,-330,0.2,0.2);
     glColor3f(0.5,0.5,0.5);
     quadrado(-400,-340,-220,-260);
 
@@ -461,6 +470,47 @@ void draw(void){
     glutPostRedisplay();
 }
 
+void draw1(void){
+    move();
+    glPushMatrix(); //movimenta o mundo em relação ao avião
+        glRotated(angle,0,1,0); //roda o mundo
+
+        glTranslated(-andar[0],-height,-andar[1]);
+        //drawGramSky();
+        //glScalef(0.3,0.3,0.3);
+        glPushMatrix();
+            for(int i = 0; i < 6; i ++){
+                glRotated(i*72, i%2, i, 0);
+                if(i%2 == 0) glTranslated(1500 + 7000*i,0 + 3000*i, 2000 + 3500*i);
+                else glTranslated(1500 - 14000*i,0 - 1200*i, 2000 - 4500*i);
+                glColor3f(i%2 + 0.3,i%2*2 + 0.2,i%2*3 + 0.4);
+                desenhaOBJ(p1_v, p1_t, p1_n);
+            }
+        glPopMatrix();
+
+        glPushMatrix();
+            glColor3f(1,1,0);
+            glTranslated(20000,0,0);
+            desenhaOBJ(p2_v, p2_t, p2_n);
+        glPopMatrix();
+
+        glPushMatrix();
+            glScalef(0.3,0.3,0.3);
+            for(int i = 0; i < 6; i ++){
+                glRotated(i*72, i%2, i, 0);
+                if(i%2 == 0) glTranslated(-1500 + 7000*i,0 + 3000*i, -2000 + 3500*i);
+                else glTranslated(-1500 - 14000*i,0 - 1200*i, -2000 - 4500*i);
+                glColor3f(i%2 + 0.3,i%2*2 + 0.2,i%2*3 + 0.4);
+                
+                desenhaOBJ(p2_v, p2_t, p2_n);
+            }
+        glPopMatrix();
+
+    glPopMatrix();
+
+    glutPostRedisplay();
+}
+
 void SpecialKeys(int key, int x, int y) {
     if(mode == 'g'){
         if(key == GLUT_KEY_UP) {    //sobe
@@ -503,11 +553,11 @@ void changeGame(){
         glMatrixMode(GL_MODELVIEW);
     }
     else if(mode == 'g'){
-        glClearColor(1.0, 1.0, 1.0, 0.0);
+        glClearColor(0.0, 0.0, 0.0, 0.0);
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glFrustum(-40.0, 40.0, -40.0, 40.0, 50.0, 12000.0); //proje��o perspectiva
+        glFrustum(-40.0, 40.0, -40.0, 40.0, 50.0, 1200000.0); //proje��o perspectiva
         glMatrixMode(GL_MODELVIEW);
     }
 }
@@ -605,7 +655,8 @@ void display(void){
         gluLookAt(pov[nave][cur_pov][0], pov[nave][cur_pov][1], pov[nave][cur_pov][2],       // define posicao do observador (x -> esquerda roda, y -> cima embaixo, z ->tras frente)
                   view[nave][cur_view][0], view[nave][cur_view][1], view[nave][cur_view][2], // ponto de interesse (foco)
                   0.0, 1.0, 0.0);    // vetor de "view up"
-        draw();
+        if(nave != 2) draw();
+        else draw1();
         drawNave();
     }
 
@@ -617,7 +668,7 @@ int main(int argc, char **argv){
     //desenhos
     parser(d_v[0], d_t[0], d_n[0], "aviao2.obj");
     parser(d_v[1], d_t[1], d_n[1], "harpy.obj");
-    parser(d_v[2], d_t[2], d_n[2], "dirigivel.obj");
+    parser(d_v[2], d_t[2], d_n[2], "falcon.obj");
 
     parser(animal1_v, animal1_t, animal1_n, ("charizard.obj"));
     parser(animal2_v, animal2_t, animal2_n, ("gumdramon.obj"));
@@ -632,6 +683,9 @@ int main(int argc, char **argv){
     parser(a3_v, a3_t, a3_n, ("arvore3.obj"));
 
     parser(chao_v, chao_t, chao_n, "grama.obj");
+
+    parser(p1_v, p1_t, p1_n, "planet2.obj");
+    parser(p2_v, p2_t, p2_n, "planet3.obj");
 
     srand(0);
     glutInit(&argc, argv);                                    //inicializa a glut
