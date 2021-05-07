@@ -23,7 +23,7 @@ int height = 0;
 int vel = 0;
 
 //point of view
-int pov[3][2][3] = {{{60,50,0},{-400,500,0}},{{35,227,0},{-400,500,0}} ,{{245,90,0},{-500,600,0}}};
+int pov[3][2][3] = {{{60,50,0},{-500,600,0}},{{35,227,0},{-500,600,0}} ,{{245,90,0},{-500,600,0}}};
 //foco 
 int view[3][2][3] = {{{500,100,0},{100,0,0}}, {{500,227,0},{100,0,0}}, {{500,90,0},{100,0,0}}};
 int cur_pov = 1;    //começa fora do objeto
@@ -39,7 +39,6 @@ GLfloat andar[2] = {0,0};
 std::vector<std::vector<vec3>> d_v(3);
 std::vector<std::vector<vec2>> d_t(3);
 std::vector<std::vector<vec3>> d_n(3);
-
 
 //vetores chao
 std::vector<vec3> chao_v;
@@ -205,13 +204,43 @@ void texto(const std::string &texto, int x, int y, double tamanhoX, double taman
     glPushMatrix();
 
     glTranslatef(x, y, 0);
-    glScalef(tamanhoX, tamanhoY, 1.0);
+    glScalef(tamanhoX, tamanhoY, 1);
     
     for(int i=0; i<texto.length(); i++) {
         glutStrokeCharacter(GLUT_STROKE_ROMAN, texto[i]);
     }
 
     glPopMatrix();
+
+    if(mode == 'g'){    //escreve altura e velocidade na tela qnd esta pov: out
+        std::string cur_vel = std::to_string(vel);
+        std::string aux = "altura:";
+        std::string cur_alt;
+
+        if(nave == 2)  cur_alt = std::to_string(height + 100000);
+        else cur_alt = std::to_string(height);
+
+        glPushMatrix();
+
+        glTranslatef(x + 130, y, 0);
+        glScalef(tamanhoX, tamanhoY, 1);
+        
+        for(int i=0; i<cur_vel.length(); i++) {
+            glutStrokeCharacter(GLUT_STROKE_ROMAN, cur_vel[i]);
+        }
+
+        glTranslatef(-1800, 0, 0);
+        for(int i=0; i<aux.length(); i++) {
+            glutStrokeCharacter(GLUT_STROKE_ROMAN, aux[i]);
+        }
+
+        glTranslatef(25, 0, 0);
+        for(int i=0; i<cur_alt.length(); i++) {
+            glutStrokeCharacter(GLUT_STROKE_ROMAN, cur_alt[i]);
+        }
+
+        glPopMatrix();
+    }
 }
 
 void quadrado(GLfloat x1, GLfloat y1, GLfloat x2, GLfloat y2) { //desenha quadrados de acordo com os parâmetros
@@ -245,6 +274,7 @@ void menu() {
 
     texto("H",20,-195,0.4,0.4); texto(" - volta para o menu",40,-185,0.2,0.2); texto("e reseta o jogo",115,-215,0.2,0.2);
     texto("esc",20,-280,0.4,0.4);  texto(" - fecha o jogo",85,-275,0.2,0.2);
+    
     //comandos
     glColor3f(1,1,1); 
     texto("Aperte1",-380,280,0.3,0.3);
@@ -287,7 +317,7 @@ void desenhaOBJ(const std::vector<vec3> &out_vertices, const std::vector<vec2> &
 }
 
 void drawNave(){    //desenha nave
-    if(nave == 0) glColor3f(0.5,0.5,0.5);
+    if(nave == 0) glColor3f(0.5,0.5,0.5);   //cada nave tem 1 cor
     if(nave == 1) glColor3f(0.76,0.23,0.13);
     if(nave == 2) glColor3f(1,0.7,0.75);
         
@@ -452,11 +482,23 @@ void move(){    //incrementa a posição do mundo em relação ao avião
     double c = 3.14159265359/180;
     andar[0] += vel*cos(c*angle);
     andar[1] += vel*sin(c*angle);
+
+    glPushMatrix(); //escreve a velocidade e a altura na tela quando esta no pov: out
+        if(nave == 2) glColor3f(1,0,0);
+        else glColor3f(1,1,1);
+        glRotated(270,0,1,0);
+        glRotated(270,1,0,0);
+
+        glTranslated(100,-430,0);
+        
+        texto("velocidade:",0,0,0.2,0.2);
+    glPopMatrix();
 }
 
-void draw(void){
+void draw(void){    //desenha o mapa
     move();
-    glPushMatrix(); //movimenta o mundo em relação ao avião
+
+    glPushMatrix();             //movimenta o mundo em relação ao avião
         glRotated(angle,0,1,0); //roda o mundo
 
         glTranslated(-andar[0],-height,-andar[1]);
@@ -470,16 +512,15 @@ void draw(void){
     glutPostRedisplay();
 }
 
-void draw1(void){
+void draw1(void){   //desenha o mapa da millenium falcon
     move();
-    glPushMatrix(); //movimenta o mundo em relação ao avião
-        glRotated(angle,0,1,0); //roda o mundo
 
-        glTranslated(-andar[0],-height,-andar[1]);
-        //drawGramSky();
-        //glScalef(0.3,0.3,0.3);
+    glPushMatrix(); //movimenta o mundo em relação ao avião
+        glRotated(angle,0,1,0);                     //roda o mundo
+        glTranslated(-andar[0],-height,-andar[1]);  //transalada o mundo
+
         glPushMatrix();
-            for(int i = 0; i < 6; i ++){
+            for(int i = 0; i < 6; i ++){            //desenha varios planetas
                 glRotated(i*72, i%2, i, 0);
                 if(i%2 == 0) glTranslated(1500 + 7000*i,0 + 3000*i, 2000 + 3500*i);
                 else glTranslated(1500 - 14000*i,0 - 1200*i, 2000 - 4500*i);
@@ -488,13 +529,13 @@ void draw1(void){
             }
         glPopMatrix();
 
-        glPushMatrix();
+        glPushMatrix(); //sol
             glColor3f(1,1,0);
             glTranslated(20000,0,0);
             desenhaOBJ(p2_v, p2_t, p2_n);
         glPopMatrix();
 
-        glPushMatrix();
+        glPushMatrix(); //desenha varios planos
             glScalef(0.3,0.3,0.3);
             for(int i = 0; i < 6; i ++){
                 glRotated(i*72, i%2, i, 0);
@@ -505,7 +546,6 @@ void draw1(void){
                 desenhaOBJ(p2_v, p2_t, p2_n);
             }
         glPopMatrix();
-
     glPopMatrix();
 
     glutPostRedisplay();
@@ -543,7 +583,7 @@ void SpecialKeys(int key, int x, int y) {
 }
 
 void changeGame(){
-    if(mode == 'm'){
+    if(mode == 'm'){    //mudda do 3d para o 2d
         glClearColor(0.0, 0.0, 0.0, 0.0);
         
         glMatrixMode (GL_PROJECTION);
@@ -552,7 +592,7 @@ void changeGame(){
         glShadeModel (GL_SMOOTH);
         glMatrixMode(GL_MODELVIEW);
     }
-    else if(mode == 'g'){
+    else if(mode == 'g'){   //muda do 2d para 3d
         glClearColor(0.0, 0.0, 0.0, 0.0);
 
         glMatrixMode(GL_PROJECTION);
@@ -562,7 +602,7 @@ void changeGame(){
     }
 }
 
-void reset(){
+void reset(){   //reseta o jogo
     angle = 0;
     right = false; 
     left = false;
@@ -572,7 +612,7 @@ void reset(){
 }
 
 void HandleKeyboard(unsigned char key, int x, int y) {
-    if(mode == 'g'){
+    if(mode == 'g'){    //no jogo
         switch (key){
             case 'W':   //acelera pra frente
             case 'w':
@@ -601,36 +641,36 @@ void HandleKeyboard(unsigned char key, int x, int y) {
 
                 changeGame();
                 break;
-            case 27:
+            case 27:    //fecha o jogo
                 exit(0);
                 break;
         }
     }
 
-    if(mode == 'm'){
+    if(mode == 'm'){    //no menu
         switch (key){
-            case '1':
+            case '1':   //seleciona o aviao
                 mode = 'g';
                 nave = 0;
                 reset();
                 changeGame();
 
                 break;
-            case '2':
+            case '2':   //seleciona a harpia
                 mode = 'g';
                 nave = 1;
                 reset();
                 changeGame();
 
                 break;
-            case '3':
+            case '3':   //seleciona a millenium falcon
                 mode = 'g';
                 nave = 2;
                 reset();
                 changeGame();
 
                 break;
-            case 27:
+            case 27:    //fecha o jogo
                 exit(0);
                 break;
         }
@@ -646,26 +686,26 @@ void init(void){
 void display(void){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    if(mode == 'm'){ 
+    if(mode == 'm'){            //menu
         glLoadIdentity();
         menu();
     }
-    else if(mode == 'g'){   //game
+    else if(mode == 'g'){       //game
         glLoadIdentity();
         gluLookAt(pov[nave][cur_pov][0], pov[nave][cur_pov][1], pov[nave][cur_pov][2],       // define posicao do observador (x -> esquerda roda, y -> cima embaixo, z ->tras frente)
                   view[nave][cur_view][0], view[nave][cur_view][1], view[nave][cur_view][2], // ponto de interesse (foco)
-                  0.0, 1.0, 0.0);    // vetor de "view up"
-        if(nave != 2) draw();
-        else draw1();
+                  0.0, 1.0, 0.0);// vetor de "view up"
+        
+        if(nave != 2) draw();   //mapa 1
+        else draw1();           //mapa millenium falcon
+
         drawNave();
     }
-
     glFlush();
     glutSwapBuffers();
 }
 
-int main(int argc, char **argv){
-    //desenhos
+void readOBJ(){//desenhos
     parser(d_v[0], d_t[0], d_n[0], "aviao2.obj");
     parser(d_v[1], d_t[1], d_n[1], "harpy.obj");
     parser(d_v[2], d_t[2], d_n[2], "falcon.obj");
@@ -686,6 +726,10 @@ int main(int argc, char **argv){
 
     parser(p1_v, p1_t, p1_n, "planet2.obj");
     parser(p2_v, p2_t, p2_n, "planet3.obj");
+}
+
+int main(int argc, char **argv){
+    readOBJ();
 
     srand(0);
     glutInit(&argc, argv);                                    //inicializa a glut
@@ -703,5 +747,6 @@ int main(int argc, char **argv){
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK); // remove a parte de tras do cubo
     glutMainLoop();
+
     return 0;
 }
