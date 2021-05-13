@@ -35,6 +35,13 @@ bool left = false;
 
 GLfloat andar[2] = {0,0};
 
+//iluminação 
+GLfloat posLuz[] = {0.0,20000.0,0.0,1.0};
+GLfloat ambiente[] = {0.8,0.8,0.8,1.0};
+GLfloat difus[] = {0.5,0.5,0.5,1.0};
+GLfloat especular[] = {0.5,0.5,0.5,1.0};
+
+
 //vetores dos dirigiveis
 std::vector<std::vector<vec3>> d_v(3);
 std::vector<std::vector<vec2>> d_t(3);
@@ -311,12 +318,24 @@ void desenhaOBJ(const std::vector<vec3> &out_vertices, const std::vector<vec2> &
     //desenha o obj
     glBegin(GL_TRIANGLES);
     for (int i = 0; i < out_vertices.size(); i++){  //lê o vetor de vertices e desenha
+        glNormal3f(out_normals[i].x,out_normals[i].y,out_normals[i].z);
         glVertex3f(out_vertices[i].x, out_vertices[i].y, out_vertices[i].z);
     }
     glEnd();
 }
 
 void drawNave(){    //desenha nave
+    GLfloat mat_ambient[ ] = { 0.2, 0.2, 0.2, 1.0 };
+    GLfloat mat_diffuse[ ] = { 0.8, 0.8, 0.8, 1.0 };
+    GLfloat mat_specular[ ] = { 0, 0, 0, 1.0 };
+    GLfloat mat_shininess[ ] = { 0, 0, 0, 1.0 };
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+    
+
     if(nave == 0) glColor3f(0.5,0.5,0.5);   //cada nave tem 1 cor
     if(nave == 1) glColor3f(0.76,0.23,0.13);
     if(nave == 2) glColor3f(1,0.7,0.75);
@@ -327,6 +346,16 @@ void drawNave(){    //desenha nave
 }
 
 void drawGramSky(){ //desenha o chao, o céu e as paredes
+    GLfloat mat_ambient[ ] = { 1, 1, 1, 1.0 };
+    GLfloat mat_diffuse[ ] = { 0.5, 0.5, 0.5, 1.0 };
+    GLfloat mat_specular[ ] = { 0.5, 0.5, 0.5, 1.0 };
+    GLfloat mat_shininess[ ] = { 1.0, 0, 0, 1.0 };
+
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+    
     glColor3f(0.13,0.55,0.13);
     desenhaOBJ(chao_v, chao_t, chao_n);
 
@@ -367,6 +396,17 @@ void drawGramSky(){ //desenha o chao, o céu e as paredes
 }
 
 void drawTree(){    //desenha as árvores
+    GLfloat mat_ambient[ ] = { 0.2, 0.2, 0.2, 1.0 };
+    GLfloat mat_diffuse[ ] = { 0.8, 0.8, 0.8, 1.0 };
+    GLfloat mat_specular[ ] = { 0, 0, 0, 1.0 };
+    GLfloat mat_shininess[ ] = { 0, 0, 0, 1.0 };
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+
+
     glColor3f(0.96,0.2,0.9);
     
     glPushMatrix();
@@ -386,6 +426,17 @@ void drawTree(){    //desenha as árvores
 }
 
 void drawCastle(){  //desenha os castelos
+    GLfloat mat_ambient[ ] = { 1, 1, 1, 1.0 };
+    GLfloat mat_diffuse[ ] = { 1, 1, 1, 1.0 };
+    GLfloat mat_specular[ ] = { 1, 1, 1, 1.0 };
+    GLfloat mat_shininess[ ] = { 1.0, 0, 0, 1.0 };
+
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+
+
     glColor3f(1,0,0);
     glPushMatrix();
         glTranslated(4000,460,3000);
@@ -424,6 +475,17 @@ void drawCastle(){  //desenha os castelos
 }
 
 void drawAnimals(){ //desenha os pokemons e os digimons
+    GLfloat mat_ambient[ ] = { 0.2, 0.2, 0.2, 1.0 };
+    GLfloat mat_diffuse[ ] = { 0.8, 0.8, 0.8, 1.0 };
+    GLfloat mat_specular[ ] = { 0, 0, 0, 1.0 };
+    GLfloat mat_shininess[ ] = { 0, 0, 0, 1.0 };
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+
+
     for(int i = 0; i < 3; i ++){
     glPushMatrix();
         glTranslated(100 + i*1000,42,140 + i*500);
@@ -466,6 +528,16 @@ void drawAnimals(){ //desenha os pokemons e os digimons
 }
 
 void drawM(){   //desenha as montanhas
+    GLfloat mat_ambient[ ] = { 1, 1, 1, 1.0 };
+    GLfloat mat_diffuse[ ] = { 1, 1, 1, 1.0 };
+    GLfloat mat_specular[ ] = { 1, 1, 1, 1.0 };
+    GLfloat mat_shininess[ ] = { 1.0, 0, 0, 1.0 };
+
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+    
     glColor3f(0,0,0);
     glPushMatrix();
         glTranslated(4500,600,-4200);
@@ -482,6 +554,13 @@ void move(){    //incrementa a posição do mundo em relação ao avião
     double c = 3.14159265359/180;
     andar[0] += vel*cos(c*angle);
     andar[1] += vel*sin(c*angle);
+
+    posLuz[0] -= vel*cos(c*angle);
+    posLuz[2] -= vel*sin(c*angle);
+
+    glLightfv(GL_LIGHT0, GL_POSITION, posLuz);
+
+    
 
     glPushMatrix(); //escreve a velocidade e a altura na tela quando esta no pov: out
         if(nave == 2) glColor3f(1,0,0);
@@ -502,6 +581,7 @@ void draw(void){    //desenha o mapa
         glRotated(angle,0,1,0); //roda o mundo
 
         glTranslated(-andar[0],-height,-andar[1]);
+        
         
         drawGramSky();  //desenha o mapa
         drawCastle();
@@ -555,9 +635,11 @@ void SpecialKeys(int key, int x, int y) {
     if(mode == 'g'){
         if(key == GLUT_KEY_UP) {    //sobe
                 height += 15;
+                posLuz[1] -= 15;
             }
         if(key == GLUT_KEY_DOWN) {  //desce
                 height -= 15;
+                posLuz[1] += 15;
             }
         if(key == GLUT_KEY_RIGHT) {  //gira para a direita
                 if(right == true){
@@ -594,7 +676,20 @@ void changeGame(){
     }
     else if(mode == 'g'){   //muda do 2d para 3d
         glClearColor(0.0, 0.0, 0.0, 0.0);
+/////////////////////////////////////////////////////////////////////////
+        glEnable(GL_LIGHTING);
+        glEnable(GL_COLOR_MATERIAL);
 
+        //glLightfv(GL_LIGHT0, GL_SPECULAR, especular );
+        glLightfv(GL_LIGHT0, GL_POSITION, posLuz);
+        glLightfv(GL_LIGHT0, GL_AMBIENT, ambiente);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, difus);
+        glLightfv(GL_LIGHT0, GL_SPECULAR, especular);
+
+        glEnable(GL_LIGHT0);
+        /*glDepthFunc(GL_LEQUAL);
+        glEnable(GL_DEPTH_TEST);*/
+//////////////////////////////////////////////////////////////////////////
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glFrustum(-40.0, 40.0, -40.0, 40.0, 50.0, 1200000.0); //proje��o perspectiva
@@ -641,9 +736,26 @@ void HandleKeyboard(unsigned char key, int x, int y) {
 
                 changeGame();
                 break;
-            case 27:    //fecha o jogo
+/////////////////////////////////////////////////////////////////
+            case 'l':
+            case 'L': 
+                glEnable(GL_LIGHTING);
+                break;
+            case 'a' :
+                glDisable(GL_LIGHTING);
+                break;
+            case 'q' : 
+                glShadeModel(GL_FLAT);;
+                break;
+            case 'g' :
+                glShadeModel(GL_SMOOTH);
+                break;
+            case 27: // “esc” on keyboard
                 exit(0);
                 break;
+            default: // “a” on keyboard
+                break;
+            //////////////////////////////////////////
         }
     }
 
@@ -700,7 +812,15 @@ void display(void){
         else draw1();           //mapa millenium falcon
 
         drawNave();
+        
+    glBegin(GL_LINES);
+        glColor3f(0,0,1); //coloquei isso daq so pra ficar mais legal de ver o desenho, se fosse tudo da mesma cor ia ficar ruim de visualizar
+        glVertex3f(0,0,0);
+        glVertex4fv(posLuz);
+    glEnd();
+    
     }
+    //glutSolidSphere(1.0, 50, 16);
     glFlush();
     glutSwapBuffers();
 }
