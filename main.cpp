@@ -36,15 +36,16 @@ bool left = false;
 GLfloat andar[2] = {0,0};
 
 //iluminação 
-GLfloat posLuz[] = {0.0,20000.0,0.0,1.0};
+GLfloat posLuz[2][4] = {{0.0,20000.0,0.0,1.0},{20000,0,0,1}}; int p = 0;
 GLfloat ambiente[] = {0.6,0.6,0.6,1.0};
-GLfloat difus[] = {0.7,0.7,0.7,1.0};
+GLfloat difus[] = {0.5,0.5,0.5,1.0};
 GLfloat especular[] = {0.3,0.3,0.3,1.0};  //muda a cor da luz refletida?
-
 
 bool shading = 1;
 bool on = 1;
 bool focos[3] = {1,1,1};
+
+
 
 //vetores dos dirigiveis
 std::vector<std::vector<vec3>> d_v(3);
@@ -272,20 +273,27 @@ void menu() {
     glColor3f(1,1,1);
     texto("Help",120,250,0.4,0.4);
 
-    texto("^",-130,135,0.4,0.4); texto(" - sobe",-110,145,0.2,0.2);
-    texto("V",-128,45,0.4,0.4); texto(" - desce",-110,45,0.2,0.2);
-    texto(">",140,135,0.4,0.4); texto(" - gira para direita",160,145,0.2,0.2);
-    texto("<",140,45,0.4,0.4); texto(" - gira para esquerda",160,45,0.2,0.2);
+    texto("^",-130,165,0.35,0.35); texto(" - sobe",-110,175,0.15,0.2);
+    texto("V",-128,105,0.35,0.35); texto(" - desce",-110,105,0.15,0.2);
+    texto(">",160,165,0.35,0.35); texto(" - gira para direita",180,175,0.15,0.2);
+    texto("<",160,105,0.35,0.35); texto(" - gira para esquerda",180,105,0.15,0.2);
 
-    texto("W",-130,-35,0.4,0.4); texto(" - acelera",-110,-25,0.2,0.2);
-    texto("S",140,-35,0.4,0.4); texto(" - desacelera",160,-25,0.2,0.2);
+    texto("W",-130,30,0.35,0.35); texto(" - acelera",-110,35,0.15,0.2);
+    texto("S",160,30,0.35,0.35); texto(" - desacelera",180,35,0.15,0.2);
 
-    texto("F",-130,-115,0.4,0.4); texto(" - POV: out",-110,-105,0.2,0.2);
-    texto("I",150,-115,0.4,0.4); texto(" - POV: inside",160,-105,0.2,0.2);
+    texto("F",-130,-45,0.35,0.35); texto(" - Point of view: out",-110,-35,0.15,0.2);
+    texto("I",170,-45,0.35,0.35); texto(" - Point of view: inside",180,-35,0.15,0.2);
 
-    texto("H",20,-195,0.4,0.4); texto(" - volta para o menu",40,-185,0.2,0.2); texto("e reseta o jogo",115,-215,0.2,0.2);
-    texto("esc",20,-280,0.4,0.4);  texto(" - fecha o jogo",85,-275,0.2,0.2);
+    texto("H",-130,-115,0.35,0.35); texto(" - volta para o menu",-110,-105,0.15,0.2); texto("e reseta o jogo",-50,-135,0.15,0.2);
+    texto("esc",160,-115,0.35,0.35);  texto(" - fecha o jogo",220,-105,0.15,0.2);
     
+    texto("L",-130,-185,0.35,0.35); texto(" - Luz on/off",-110,-180,0.15,0.2);
+    texto("G",160,-185,0.35,0.35); texto(" - Flat/Gouraud shading",190,-180,0.15,0.2);
+
+    texto("1",10,-255,0.35,0.35); texto(" - Foco de luz 1 on/off",40,-250,0.15,0.2);
+    texto("2",10,-325,0.35,0.35); texto(" - Foco de luz 2 on/off",40,-320,0.15,0.2);
+
+
     //comandos
     glColor3f(1,1,1); 
     texto("Aperte1",-380,280,0.3,0.3);
@@ -343,9 +351,8 @@ void drawGramSky(){ //desenha o chao, o céu e as paredes
     
     glColor3f(0.13,0.55,0.13);
     desenhaOBJ(chao_v, chao_t, chao_n);
-    
 
-   /* glPushMatrix(); //céu
+    /*glPushMatrix(); //céu
         glColor3f(0.12,0.699,0.756);
         glTranslated(1,2000,1);
         desenhaOBJ(chao_v, chao_t, chao_n);
@@ -498,10 +505,10 @@ void move(){    //incrementa a posição do mundo em relação ao avião
     andar[0] += vel*cos(c*angle);
     andar[1] += vel*sin(c*angle);
 
-    posLuz[0] -= vel*cos(c*angle);
-    posLuz[2] -= vel*sin(c*angle);
+    posLuz[p][0] -= vel*cos(c*angle);
+    posLuz[p][2] -= vel*sin(c*angle);
 
-    glLightfv(GL_LIGHT0, GL_POSITION, posLuz);
+    glLightfv(GL_LIGHT0, GL_POSITION, posLuz[p]);
 
     
 
@@ -578,11 +585,11 @@ void SpecialKeys(int key, int x, int y) {
     if(mode == 'g'){
         if(key == GLUT_KEY_UP) {    //sobe
                 height += 15;
-                posLuz[1] -= 15;
+                posLuz[p][1] -= 15;
             }
         if(key == GLUT_KEY_DOWN) {  //desce
                 height -= 15;
-                posLuz[1] += 15;
+                posLuz[p][1] += 15;
             }
         if(key == GLUT_KEY_RIGHT) {  //gira para a direita
                 if(right == true){
@@ -625,6 +632,8 @@ void changeGame(){
 /////////////////////////////////////////////////////////////////////////
         glEnable(GL_LIGHTING);      //habilita os calculos com luzes
         glEnable(GL_LIGHT0);        //habilita a luz 0
+        glEnable (GL_LIGHT1);
+
         glEnable(GL_COLOR_MATERIAL);
 
         //ambiente e difusa definem as cores;
@@ -637,14 +646,32 @@ void changeGame(){
         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
         //glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
-        glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 90);
+        glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 20);
+        
+        GLfloat l1_a[] = {0.5,0.5,0.5,1};
+        GLfloat l1_d[] = {0.5,0.5,0.5,1};
+        GLfloat l1_e[] = {0.5,0.5,0.5,1};
+        GLfloat l1_p[] = {0,0,-400,1};
+        GLfloat spot_direction [] = {0,0,-1}; 
+        
+        glLightfv(GL_LIGHT1, GL_AMBIENT, l1_a);
+        glLightfv(GL_LIGHT1, GL_DIFFUSE, l1_d);  
+        glLightfv(GL_LIGHT1, GL_SPECULAR, l1_e);
+        glLightfv(GL_LIGHT1, GL_POSITION, l1_p); 
+        glLightf(GL_LIGHT1, GL_CONSTANT_ATTENUATION, 2);
+        glLightf(GL_LIGHT1, GL_LINEAR_ATTENUATION , 0.0 );
+        glLightf(GL_LIGHT1, GL_QUADRATIC_ATTENUATION , 0 );
 
-        glLightfv(GL_LIGHT0, GL_POSITION, posLuz);      //seta a posição da luz
+        glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 30);
+        glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spot_direction);
+        glLightf(GL_LIGHT1, GL_SPOT_EXPONENT,1.0);
+        
+        glLightfv(GL_LIGHT0, GL_POSITION, posLuz[p]);      //seta a posição da luz
         glLightfv(GL_LIGHT0, GL_AMBIENT, ambiente);     //seta a luz ambiente
         glLightfv(GL_LIGHT0, GL_DIFFUSE, difus);        //seta a luz difusa (luz refletida em todas as direções)
         glLightfv(GL_LIGHT0, GL_SPECULAR, especular);   //seta a luz especual (pontos de intesidade luminosa, superficies espelhadas)
 
-        glDepthFunc(GL_LEQUAL);
+        //glDepthFunc(GL_LEQUAL);
         glEnable(GL_DEPTH_TEST);
 //////////////////////////////////////////////////////////////////////////
         glMatrixMode(GL_PROJECTION);
@@ -690,7 +717,6 @@ void HandleKeyboard(unsigned char key, int x, int y) {
             case 'h':
             case 'H':
                 mode = 'm';
-
                 changeGame();
                 break;
 /////////////////////////////////////////////////////////////////
@@ -704,13 +730,22 @@ void HandleKeyboard(unsigned char key, int x, int y) {
                     on = 1;
                 }
                 break;
-            case 49:
+            case '1':
                 if(focos[0]){
                     glDisable(GL_LIGHT0);
                     focos[0] = 0;
                 } else{
                     glEnable(GL_LIGHT0);
                     focos[0] = 1;
+                }
+                break;
+            case '2':
+                if(focos[1]){
+                    glDisable(GL_LIGHT1);
+                    focos[1] = 0;
+                } else{
+                    glEnable(GL_LIGHT1);
+                    focos[1] = 1;
                 }
                 break;
             case 'g':
@@ -738,6 +773,7 @@ void HandleKeyboard(unsigned char key, int x, int y) {
             case '1':   //seleciona o aviao
                 mode = 'g';
                 nave = 0;
+                p = 0;
                 reset();
                 changeGame();
 
@@ -745,6 +781,7 @@ void HandleKeyboard(unsigned char key, int x, int y) {
             case '2':   //seleciona a harpia
                 mode = 'g';
                 nave = 1;
+                p = 0;
                 reset();
                 changeGame();
 
@@ -752,6 +789,7 @@ void HandleKeyboard(unsigned char key, int x, int y) {
             case '3':   //seleciona a millenium falcon
                 mode = 'g';
                 nave = 2;
+                p = 1;
                 reset();
                 changeGame();
 
@@ -787,12 +825,11 @@ void display(void){
 
         drawNave();
         
-   /* glBegin(GL_LINES);
-        glColor3f(0,0,1); //coloquei isso daq so pra ficar mais legal de ver o desenho, se fosse tudo da mesma cor ia ficar ruim de visualizar
+    /*glBegin(GL_LINES);
+        glColor3f(0,1,1); //coloquei isso daq so pra ficar mais legal de ver o desenho, se fosse tudo da mesma cor ia ficar ruim de visualizar
         glVertex3f(0,0,0);
-        glVertex4fv(posLuz);
+        glVertex4fv(l1_p);
     glEnd();*/
-    
     }
     //glutSolidSphere(1.0, 50, 16);
     glFlush();
