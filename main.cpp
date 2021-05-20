@@ -41,11 +41,21 @@ GLfloat ambiente[] = {0.6,0.6,0.6,1.0};
 GLfloat difus[] = {0.5,0.5,0.5,1.0};
 GLfloat especular[] = {0.3,0.3,0.3,1.0};  //muda a cor da luz refletida?
 
-bool shading = 1;
-bool on = 1;
-bool focos[3] = {1,1,1};
+//quantidade refletida de luz pelo materiais
+GLfloat mat_ambient[ ] = { 0.5, 0.5, 0.5, 1.0 };
+GLfloat mat_specular[ ] = { 0.5, 0.5, 0.5, 1.0 };
+GLfloat mat_shininess[ ] = { 0.5, 0.5, 0.5, 1.0 };
 
+//luzes ambiente, especular e difusa para a spot ligth
+GLfloat l1_a[] = {0.5,0.5,0.5,1};
+GLfloat l1_d[] = {0.5,0.5,0.5,1};
+GLfloat l1_e[] = {0.5,0.5,0.5,1};
+GLfloat l1_p[] = {0,0,-400,1};  //posição
+GLfloat spot_direction [] = {0,0,-1};   //direção da luz
 
+bool shading = 1;   //para mudar o shading
+bool on = 1;        //ligar e desligar os cálculos com iluminação
+bool focos[2] = {1,1};  //para ligar e desligar os focos de luz
 
 //vetores dos dirigiveis
 std::vector<std::vector<vec3>> d_v(3);
@@ -293,7 +303,6 @@ void menu() {
     texto("1",10,-255,0.35,0.35); texto(" - Foco de luz 1 on/off",40,-250,0.15,0.2);
     texto("2",10,-325,0.35,0.35); texto(" - Foco de luz 2 on/off",40,-320,0.15,0.2);
 
-
     //comandos
     glColor3f(1,1,1); 
     texto("Aperte1",-380,280,0.3,0.3);
@@ -323,7 +332,6 @@ void menu() {
     texto("millenium",-365,-290,0.2,0.2); texto("falcon",-345,-330,0.2,0.2);
     glColor3f(0.5,0.5,0.5);
     quadrado(-400,-340,-220,-260);
-
 }
 
 void desenhaOBJ(const std::vector<vec3> &out_vertices, const std::vector<vec2> &out_texcoord, const std::vector<vec3> &out_normals){
@@ -347,12 +355,10 @@ void drawNave(){    //desenha nave
 }
 
 void drawGramSky(){ //desenha o chao, o céu e as paredes
-    /**/
-    
     glColor3f(0.13,0.55,0.13);
     desenhaOBJ(chao_v, chao_t, chao_n);
 
-    /*glPushMatrix(); //céu
+    glPushMatrix(); //céu
         glColor3f(0.12,0.699,0.756);
         glTranslated(1,2000,1);
         desenhaOBJ(chao_v, chao_t, chao_n);
@@ -385,7 +391,7 @@ void drawGramSky(){ //desenha o chao, o céu e as paredes
         glTranslated(0,0,6000);
         glRotated(90,1,0,0);
         desenhaOBJ(chao_v, chao_t, chao_n);
-    glPopMatrix();*/
+    glPopMatrix();
 }
 
 void drawTree(){    //desenha as árvores
@@ -629,31 +635,18 @@ void changeGame(){
     }
     else if(mode == 'g'){   //muda do 2d para 3d
         glClearColor(0.0, 0.0, 0.0, 1.0);
-/////////////////////////////////////////////////////////////////////////
+
         glEnable(GL_LIGHTING);      //habilita os calculos com luzes
         glEnable(GL_LIGHT0);        //habilita a luz 0
-        glEnable (GL_LIGHT1);
+        glEnable (GL_LIGHT1);       //habilita a luz 1
 
         glEnable(GL_COLOR_MATERIAL);
 
-        //ambiente e difusa definem as cores;
-        //quantidade refletida de luz
-        GLfloat mat_ambient[ ] = { 0.5, 0.5, 0.5, 1.0 };
-        GLfloat mat_specular[ ] = { 0.5, 0.5, 0.5, 1.0 };
-        GLfloat mat_shininess[ ] = { 0.5, 0.5, 0.5, 1.0 };
-        //GLfloat mat_diffuse[ ] = { 0, 0, 0, 1.0 };
-
         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
-        //glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
         glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 20);
         
-        GLfloat l1_a[] = {0.5,0.5,0.5,1};
-        GLfloat l1_d[] = {0.5,0.5,0.5,1};
-        GLfloat l1_e[] = {0.5,0.5,0.5,1};
-        GLfloat l1_p[] = {0,0,-400,1};
-        GLfloat spot_direction [] = {0,0,-1}; 
-        
+        //spot ligth
         glLightfv(GL_LIGHT1, GL_AMBIENT, l1_a);
         glLightfv(GL_LIGHT1, GL_DIFFUSE, l1_d);  
         glLightfv(GL_LIGHT1, GL_SPECULAR, l1_e);
@@ -673,7 +666,7 @@ void changeGame(){
 
         //glDepthFunc(GL_LEQUAL);
         glEnable(GL_DEPTH_TEST);
-//////////////////////////////////////////////////////////////////////////
+
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glFrustum(-40.0, 40.0, -40.0, 40.0, 50.0, 1200000.0); //proje��o perspectiva
@@ -719,9 +712,8 @@ void HandleKeyboard(unsigned char key, int x, int y) {
                 mode = 'm';
                 changeGame();
                 break;
-/////////////////////////////////////////////////////////////////
             case 'l':
-            case 'L': 
+            case 'L': //habulita/desabilita calculos de iluminação
                 if(on){
                     glDisable(GL_LIGHTING);
                     on = 0;
@@ -730,7 +722,7 @@ void HandleKeyboard(unsigned char key, int x, int y) {
                     on = 1;
                 }
                 break;
-            case '1':
+            case '1':   //foco de luz on/off
                 if(focos[0]){
                     glDisable(GL_LIGHT0);
                     focos[0] = 0;
@@ -749,7 +741,7 @@ void HandleKeyboard(unsigned char key, int x, int y) {
                 }
                 break;
             case 'g':
-            case 'G':
+            case 'G':   //alterna os shading
                 if(shading){
                     glShadeModel(GL_FLAT);
                     shading = 0;
@@ -764,7 +756,6 @@ void HandleKeyboard(unsigned char key, int x, int y) {
                 break;
             default: // “a” on keyboard
                 break;
-            //////////////////////////////////////////
         }
     }
 
