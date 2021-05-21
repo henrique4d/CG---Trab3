@@ -356,7 +356,10 @@ void drawNave(){    //desenha nave
 
 void drawGramSky(){ //desenha o chao, o céu e as paredes
     glColor3f(0.13,0.55,0.13);
+    glPushMatrix();
+    
     desenhaOBJ(chao_v, chao_t, chao_n);
+    glPopMatrix();
 
     glPushMatrix(); //céu
         glColor3f(0.12,0.699,0.756);
@@ -375,6 +378,7 @@ void drawGramSky(){ //desenha o chao, o céu e as paredes
     glPushMatrix();
         glColor3f(0.88,1,1);
         glTranslated(-6000,0,0);
+        glRotated(180,0,1,0);
         glRotated(90,0,0,1);
         desenhaOBJ(chao_v, chao_t, chao_n);
     glPopMatrix();
@@ -389,7 +393,9 @@ void drawGramSky(){ //desenha o chao, o céu e as paredes
     glPushMatrix();
         glColor3f(0.88,1,1);
         glTranslated(0,0,6000);
+        glRotated(180,0,1,0);
         glRotated(90,1,0,0);
+        
         desenhaOBJ(chao_v, chao_t, chao_n);
     glPopMatrix();
 }
@@ -844,7 +850,7 @@ void readOBJ(){//desenhos
     parser(a2_v, a2_t, a2_n, ("arvore2.obj"));
     parser(a3_v, a3_t, a3_n, ("arvore3.obj"));
 
-    parser(chao_v, chao_t, chao_n, "grama.obj");
+    parser(chao_v, chao_t, chao_n, "gram.obj");
 
     parser(p1_v, p1_t, p1_n, "planet2.obj");
     parser(p2_v, p2_t, p2_n, "planet3.obj");
